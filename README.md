@@ -112,3 +112,10 @@ your_project/
 ## Citation
 
 > Lakhssassi N, Zhou Z, Liu S, et al. (2020). Soybean TILLING-by-Sequencing⁺ reveals the role of novel GmSACPD members in unsaturated fatty acid biosynthesis while maintaining healthy nodules. *Journal of Experimental Botany*, 71(22), 6969–6987. https://doi.org/10.1093/jxb/eraa402
+
+
+## Performance
+
+Sustained ~60–70 ms per frame (~16 FPS) on a MacBook Air CPU, stable across 1,700+ frames:
+
+![Latency](docs/latency.png)
