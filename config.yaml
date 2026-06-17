@@ -1,0 +1,14 @@
+# Pipeline configuration. Override any of these on the CLI (see main.py --help).
+source: 0              # webcam index (0) or a path/URL to a video stream
+model: yolov8n.pt      # YOLOv8 weights; n/s/m/l/x trade speed for accuracy
+conf_threshold: 0.4    # minimum detection confidence to keep
+
+preprocess:
+  clip_limit: 2.0      # CLAHE contrast cap (higher = stronger normalization)
+  tile_grid: [8, 8]    # CLAHE tile grid
+
+metrics:
+  window: 30           # rolling window (frames) for live FPS
+  plot_path: outputs/latency.png
+
+log_level: INFO

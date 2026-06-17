@@ -11,7 +11,7 @@ THE TECHNIQUE: CLAHE (Contrast Limited Adaptive Histogram Equalization).
 Plain histogram equalization brightens an image but blows out already-bright
 regions. CLAHE instead equalizes contrast in small tiles across the image and
 caps how much any tile can be amplified, so dark areas get lifted without
-washing out bright areas. We apply it only to the brightness (L) channel in
+washing out bright areas. We apply it only to the brightness channel in
 LAB color space so colors are not distorted.
 """
 
@@ -27,13 +27,13 @@ class LightingNormalizer:
 
     def apply(self, frame):
         """Return a lighting-normalized copy of a BGR frame."""
-        # Convert to LAB: L = lightness, A/B = color. We only touch L.
+        # Convert to LAB: lightness + two color channels. We only touch lightness.
         lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
-        l, a, b = cv2.split(lab)
+        lightness, chan_a, chan_b = cv2.split(lab)
 
         # Equalize contrast on the lightness channel only.
-        l = self.clahe.apply(l)
+        lightness = self.clahe.apply(lightness)
 
         # Recombine and convert back to BGR for the detector.
-        merged = cv2.merge((l, a, b))
+        merged = cv2.merge((lightness, chan_a, chan_b))
         return cv2.cvtColor(merged, cv2.COLOR_LAB2BGR)
