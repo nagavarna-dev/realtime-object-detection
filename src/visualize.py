@@ -11,13 +11,17 @@ Two kinds of visualization:
    the performance, not just read a number.
 """
 
-import logging  # noqa: I001
+import logging
 import os
 
+# Select a non-interactive Matplotlib backend before pyplot is imported, so the
+# plot can be saved to a file on headless machines (servers, CI, containers)
+# with no display attached. Setting it via the environment keeps the imports in
+# normal sorted order (no mid-file matplotlib.use() call to special-case).
+os.environ.setdefault("MPLBACKEND", "Agg")
+
 import cv2
-import matplotlib
-matplotlib.use("Agg")          # must precede pyplot import (headless backend)
-import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.pyplot as plt
 
 log = logging.getLogger(__name__)
 
