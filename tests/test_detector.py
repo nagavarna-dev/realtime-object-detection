@@ -1,7 +1,15 @@
-"""Tests for ObjectDetector output schema, with YOLO fully mocked."""
-from unittest.mock import MagicMock, patch
+"""Tests for ObjectDetector output schema, with YOLO fully mocked.
+
+These run without `ultralytics` installed: the detector imports it lazily inside
+__init__, and we inject a fake `ultralytics` module so construction succeeds and
+no torch backend or model weights are ever touched.
+"""
+import sys
+from types import ModuleType
+from unittest.mock import MagicMock
 
 import numpy as np
+import pytest
 
 
 class _FakeBox:
@@ -17,9 +25,18 @@ def _fake_results(boxes):
     return [r]
 
 
-@patch("src.detector.YOLO")
-def test_detect_returns_clean_schema(mock_yolo):
-    instance = mock_yolo.return_value
+@pytest.fixture
+def fake_yolo(monkeypatch):
+    """Install a fake `ultralytics` module exposing a controllable YOLO class."""
+    fake_module = ModuleType("ultralytics")
+    yolo_cls = MagicMock(name="YOLO")
+    fake_module.YOLO = yolo_cls
+    monkeypatch.setitem(sys.modules, "ultralytics", fake_module)
+    return yolo_cls
+
+
+def test_detect_returns_clean_schema(fake_yolo):
+    instance = fake_yolo.return_value
     instance.names = {0: "person", 2: "car"}
     instance.return_value = _fake_results([
         _FakeBox([10.4, 20.6, 110.9, 220.1], cls=0, conf=0.91),
@@ -40,9 +57,8 @@ def test_detect_returns_clean_schema(mock_yolo):
     assert out[1]["label"] == "car"
 
 
-@patch("src.detector.YOLO")
-def test_detect_handles_no_boxes(mock_yolo):
-    instance = mock_yolo.return_value
+def test_detect_handles_no_boxes(fake_yolo):
+    instance = fake_yolo.return_value
     instance.names = {}
     instance.return_value = _fake_results([])
 
